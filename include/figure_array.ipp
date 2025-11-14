@@ -1,15 +1,10 @@
-#include "figure_array.hpp"
-
 namespace figures {
 
 template<FloatingPointScalar T>
-FigureArray<T>::FigureArray() : count(0) {
-    figures = Array<std::shared_ptr<Figure<T>>>(10, nullptr);
-}
+FigureArray<T>::FigureArray() : count(0), figures(10, nullptr) {}
 
 template<FloatingPointScalar T>
-FigureArray<T>::FigureArray(const FigureArray& other) : count(other.count) {
-    figures = Array<std::shared_ptr<Figure<T>>>(other.count);
+FigureArray<T>::FigureArray(const FigureArray& other) : count(other.count), figures(other.figures) {
     for (size_t i = 0; i < count; ++i) {
         figures[i] = other.figures[i]->clone();
     }
@@ -22,13 +17,22 @@ FigureArray<T>::FigureArray(FigureArray&& other) noexcept
 }
 
 template<FloatingPointScalar T>
-FigureArray<T>::~FigureArray() = default;
+FigureArray<T>::~FigureArray() {
+    for (size_t i = 0; i < count; ++i) {
+        delete figures[i];
+    }
+}
 
 template<FloatingPointScalar T>
 FigureArray<T>& FigureArray<T>::operator=(const FigureArray& other) {
     if (this != &other) {
+        for (size_t i = 0; i < count; ++i) {
+            delete figures[i];
+        }
+        
         count = other.count;
-        figures = Array<std::shared_ptr<Figure<T>>>(count);
+        figures = other.figures; 
+        
         for (size_t i = 0; i < count; ++i) {
             figures[i] = other.figures[i]->clone();
         }
@@ -39,6 +43,10 @@ FigureArray<T>& FigureArray<T>::operator=(const FigureArray& other) {
 template<FloatingPointScalar T>
 FigureArray<T>& FigureArray<T>::operator=(FigureArray&& other) noexcept {
     if (this != &other) {
+        for (size_t i = 0; i < count; ++i) {
+            delete figures[i];
+        }
+        
         figures = std::move(other.figures);
         count = other.count;
         other.count = 0;
@@ -47,7 +55,7 @@ FigureArray<T>& FigureArray<T>::operator=(FigureArray&& other) noexcept {
 }
 
 template<FloatingPointScalar T>
-void FigureArray<T>::addFigure(std::shared_ptr<Figure<T>> figure) {
+void FigureArray<T>::addFigure(Figure<T>* figure) {
     if (count >= figures.size()) {
         figures.resize(figures.size() * 2);
     }
@@ -59,8 +67,10 @@ template<FloatingPointScalar T>
 void FigureArray<T>::removeFigure(size_t index) {
     if (index >= count) return;
     
+    delete figures[index];
+    
     for (size_t i = index; i < count - 1; ++i) {
-        figures[i] = std::move(figures[i + 1]);
+        figures[i] = figures[i + 1];
     }
     figures[count - 1] = nullptr;
     count--;
@@ -89,12 +99,18 @@ double FigureArray<T>::totalArea() const {
 }
 
 template<FloatingPointScalar T>
-std::shared_ptr<Figure<T>> FigureArray<T>::operator[](size_t index) {
+Figure<T>* FigureArray<T>::operator[](size_t index) {
+    if (index >= count) {
+        throw std::out_of_range("Index out of range");
+    }
     return figures[index];
 }
 
 template<FloatingPointScalar T>
-const std::shared_ptr<Figure<T>> FigureArray<T>::operator[](size_t index) const {
+const Figure<T>* FigureArray<T>::operator[](size_t index) const {
+    if (index >= count) {
+        throw std::out_of_range("Index out of range");
+    }
     return figures[index];
 }
 

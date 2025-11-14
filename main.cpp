@@ -9,20 +9,17 @@ using namespace figures;
 int main() {
     FigureArray<double> figures;
     
-    // Добавляем различные фигуры
-    auto square = std::make_shared<Square<double>>();
-    auto rectangle = std::make_shared<Rectangle<double>>();
-    auto trapezoid = std::make_shared<Trapezoid<double>>();
+    auto square = new Square<double>();
+    auto rectangle = new Rectangle<double>();
+    auto trapezoid = new Trapezoid<double>();
     
     figures.addFigure(square);
     figures.addFigure(rectangle);
     figures.addFigure(trapezoid);
     
-    // Выводим информацию о всех фигурах
     std::cout << "All figures:" << std::endl;
     std::cout << figures << std::endl;
     
-    // Выводим общую площадь
     std::cout << "Total area: " << figures.totalArea() << std::endl;
     
     return 0;

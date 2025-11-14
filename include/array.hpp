@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include <memory>
+#include <algorithm>
 #include <stdexcept>
 
 namespace figures {
@@ -10,7 +10,7 @@ template<typename T>
 class Array {
 private:
     size_t capacity_;
-    std::shared_ptr<T[]> data_;
+    T* data_;
 
 public:
     Array();

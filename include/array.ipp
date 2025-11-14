@@ -18,18 +18,23 @@ Array<T>::Array(const Array& other) : capacity_(other.capacity_), data_(new T[ot
 }
 
 template<typename T>
-Array<T>::Array(Array&& other) noexcept : capacity_(other.capacity_), data_(std::move(other.data_)) {
+Array<T>::Array(Array&& other) noexcept : capacity_(other.capacity_), data_(other.data_) {
+    other.data_ = nullptr;
     other.capacity_ = 0;
 }
 
 template<typename T>
-Array<T>::~Array() noexcept = default;
+Array<T>::~Array() noexcept {
+    delete[] data_;
+}
 
 template<typename T>
 Array<T>& Array<T>::operator=(const Array& other) {
     if (this != &other) {
+        delete[] data_;
+        
         capacity_ = other.capacity_;
-        data_.reset(new T[capacity_]);
+        data_ = new T[capacity_];
         for (size_t i = 0; i < capacity_; ++i) {
             data_[i] = other.data_[i];
         }
@@ -40,8 +45,11 @@ Array<T>& Array<T>::operator=(const Array& other) {
 template<typename T>
 Array<T>& Array<T>::operator=(Array&& other) noexcept {
     if (this != &other) {
+        delete[] data_;
+        
         capacity_ = other.capacity_;
-        data_ = std::move(other.data_);
+        data_ = other.data_;
+        other.data_ = nullptr;
         other.capacity_ = 0;
     }
     return *this;
@@ -73,24 +81,26 @@ template<typename T>
 void Array<T>::resize(size_t new_size) {
     if (new_size == capacity_) return;
     
-    auto new_data = std::shared_ptr<T[]>(new T[new_size]);
+    T* new_data = new T[new_size];
     size_t copy_size = std::min(capacity_, new_size);
     
     for (size_t i = 0; i < copy_size; ++i) {
-        new_data[i] = std::move(data_[i]);
+        new_data[i] = data_[i];  
     }
     
     for (size_t i = copy_size; i < new_size; ++i) {
-        new_data[i] = T{};
+        new_data[i] = T{};  
     }
     
-    data_ = std::move(new_data);
+    delete[] data_;
+    data_ = new_data;
     capacity_ = new_size;
 }
 
 template<typename T>
 void Array<T>::clear() {
-    data_.reset();
+    delete[] data_;
+    data_ = nullptr;
     capacity_ = 0;
 }
 

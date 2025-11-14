@@ -1,16 +1,17 @@
 #pragma once
 
-#include <memory>
+#include <iostream>
+#include <stdexcept>
 
-#include "array.hpp"
 #include "figure.hpp"
+#include "array.hpp"  
 
 namespace figures {
 
 template<FloatingPointScalar T>
 class FigureArray {
 private:
-    Array<std::shared_ptr<Figure<T>>> figures;
+    Array<Figure<T>*> figures;  
     size_t count;
 
 public:
@@ -22,13 +23,13 @@ public:
     FigureArray& operator=(const FigureArray& other);
     FigureArray& operator=(FigureArray&& other) noexcept;
 
-    void addFigure(std::shared_ptr<Figure<T>> figure);
+    void addFigure(Figure<T>* figure);
     void removeFigure(size_t index);
     void printAllFigures(std::ostream& os) const;
     double totalArea() const;
     
-    std::shared_ptr<Figure<T>> operator[](size_t index);
-    const std::shared_ptr<Figure<T>> operator[](size_t index) const;
+    Figure<T>* operator[](size_t index);
+    const Figure<T>* operator[](size_t index) const;
     
     size_t size() const;
 };

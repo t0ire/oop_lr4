@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <memory>
 
 #include "point.hpp"
 
@@ -20,7 +19,7 @@ public:
     virtual void printVertices(std::ostream& os) const = 0;
     virtual void readFromStream(std::istream& is) = 0;
     
-    virtual std::shared_ptr<Figure<T>> clone() const = 0;
+    virtual Figure<T>* clone() const = 0;
     virtual bool operator==(const Figure& other) const = 0;
     
     operator double() const;

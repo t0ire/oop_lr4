@@ -1,38 +1,43 @@
 #include <cmath>
-
-#include "trapezoid.hpp"
+#include <cstring>
 
 namespace figures {
 
 template<FloatingPointScalar T>
-Trapezoid<T>::Trapezoid() 
-    : vertices{
-        std::make_unique<Point<T>>(-1.5, -1),
-        std::make_unique<Point<T>>(1.5, -1),
-        std::make_unique<Point<T>>(1, 1),
-        std::make_unique<Point<T>>(-1, 1)
-    } {}
+Trapezoid<T>::Trapezoid() {
+    vertices[0] = new Point<T>(-1.5, -1);
+    vertices[1] = new Point<T>(1.5, -1);
+    vertices[2] = new Point<T>(1, 1);
+    vertices[3] = new Point<T>(-1, 1);
+}
 
 template<FloatingPointScalar T>
-Trapezoid<T>::Trapezoid(const Point<T>& p1, const Point<T>& p2, const Point<T>& p3, const Point<T>& p4)
-    : vertices{
-        std::make_unique<Point<T>>(p1),
-        std::make_unique<Point<T>>(p2),
-        std::make_unique<Point<T>>(p3),
-        std::make_unique<Point<T>>(p4)
-    } {}
+Trapezoid<T>::Trapezoid(const Point<T>& p1, const Point<T>& p2, const Point<T>& p3, const Point<T>& p4) {
+    vertices[0] = new Point<T>(p1);
+    vertices[1] = new Point<T>(p2);
+    vertices[2] = new Point<T>(p3);
+    vertices[3] = new Point<T>(p4);
+}
 
 template<FloatingPointScalar T>
 Trapezoid<T>::Trapezoid(const Trapezoid& other) {
     for (int i = 0; i < VERTICES_COUNT; ++i) {
-        vertices[i] = std::make_unique<Point<T>>(*other.vertices[i]);
+        vertices[i] = new Point<T>(*other.vertices[i]);
     }
 }
 
 template<FloatingPointScalar T>
 Trapezoid<T>::Trapezoid(Trapezoid&& other) noexcept {
     for (int i = 0; i < VERTICES_COUNT; ++i) {
-        vertices[i] = std::move(other.vertices[i]);
+        vertices[i] = other.vertices[i];
+        other.vertices[i] = nullptr;
+    }
+}
+
+template<FloatingPointScalar T>
+Trapezoid<T>::~Trapezoid() {
+    for (int i = 0; i < VERTICES_COUNT; ++i) {
+        delete vertices[i];
     }
 }
 
@@ -40,7 +45,8 @@ template<FloatingPointScalar T>
 Trapezoid<T>& Trapezoid<T>::operator=(const Trapezoid& other) {
     if (this != &other) {
         for (int i = 0; i < VERTICES_COUNT; ++i) {
-            vertices[i] = std::make_unique<Point<T>>(*other.vertices[i]);
+            delete vertices[i];
+            vertices[i] = new Point<T>(*other.vertices[i]);
         }
     }
     return *this;
@@ -50,7 +56,9 @@ template<FloatingPointScalar T>
 Trapezoid<T>& Trapezoid<T>::operator=(Trapezoid&& other) noexcept {
     if (this != &other) {
         for (int i = 0; i < VERTICES_COUNT; ++i) {
-            vertices[i] = std::move(other.vertices[i]);
+            delete vertices[i];
+            vertices[i] = other.vertices[i];
+            other.vertices[i] = nullptr;
         }
     }
     return *this;
@@ -103,13 +111,14 @@ void Trapezoid<T>::readFromStream(std::istream& is) {
     for (int i = 0; i < VERTICES_COUNT; ++i) {
         T x, y;
         is >> x >> y;
-        vertices[i] = std::make_unique<Point<T>>(x, y);
+        delete vertices[i];
+        vertices[i] = new Point<T>(x, y);
     }
 }
 
 template<FloatingPointScalar T>
-std::shared_ptr<Figure<T>> Trapezoid<T>::clone() const {
-    return std::make_shared<Trapezoid<T>>(*this);
+Figure<T>* Trapezoid<T>::clone() const {
+    return new Trapezoid<T>(*this);
 }
 
 }

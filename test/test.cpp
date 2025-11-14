@@ -116,7 +116,7 @@ TEST(RectangleTest, AreaCalculation) {
 }
 
 // Тест вычисления геометрического центра прямоугольника
-TEST(RectangleTest, GeometricCenter) {
+TEST(RectangleTest1, GeometricCenter) {
     Point<double> p1(0, 0);
     Point<double> p2(6, 0);
     Point<double> p3(6, 4);
@@ -142,7 +142,7 @@ TEST(TrapezoidTest, AreaCalculation) {
 }
 
 // Тест вычисления геометрического центра трапеции
-TEST(TrapezoidTest, GeometricCenter) {
+TEST(TrapezoidTest1, GeometricCenter) {
     Point<double> p1(-1.5, -1);
     Point<double> p2(1.5, -1);
     Point<double> p3(1, 1);
@@ -168,7 +168,7 @@ TEST(ArrayTest, BasicOperations) {
 }
 
 // Тест изменения размера массива
-TEST(ArrayTest, Resize) {
+TEST(ArrayTest1, Resize) {
     Array<int> arr(3, 5);
     arr.resize(5);  // Увеличение размера
     
@@ -181,7 +181,7 @@ TEST(ArrayTest, Resize) {
 }
 
 // Тест семантики копирования и перемещения для массива
-TEST(ArrayTest, CopyAndMove) {
+TEST(ArrayTest2, CopyAndMove) {
     Array<int> arr1(3, 7);
     Array<int> arr2 = arr1;  // Копирование
     
@@ -197,8 +197,8 @@ TEST(ArrayTest, CopyAndMove) {
 TEST(FigureArrayTest, AddAndRemoveFigures) {
     FigureArray<double> figureArray;
     
-    auto square = std::make_shared<Square<double>>();
-    auto rectangle = std::make_shared<Rectangle<double>>();
+    auto square = new Square<double>();
+    auto rectangle = new Rectangle<double>();
     
     figureArray.addFigure(square);
     figureArray.addFigure(rectangle);
@@ -210,14 +210,14 @@ TEST(FigureArrayTest, AddAndRemoveFigures) {
 }
 
 // Тест вычисления общей площади всех фигур в массиве
-TEST(FigureArrayTest, TotalArea) {
+TEST(FigureArrayTest1, TotalArea) {
     FigureArray<double> figureArray;
     
     Point<double> p1(0, 0), p2(2, 0), p3(2, 2), p4(0, 2);
-    auto square = std::make_shared<Square<double>>(p1, p2, p3, p4); // Площадь = 4
+    auto square = new Square<double>(p1, p2, p3, p4); // Площадь = 4
     
     Point<double> r1(0, 0), r2(3, 0), r3(3, 2), r4(0, 2);
-    auto rectangle = std::make_shared<Rectangle<double>>(r1, r2, r3, r4); // Площадь = 6
+    auto rectangle = new Rectangle<double>(r1, r2, r3, r4); // Площадь = 6
     
     figureArray.addFigure(square);
     figureArray.addFigure(rectangle);
@@ -226,9 +226,9 @@ TEST(FigureArrayTest, TotalArea) {
 }
 
 // Тест семантики копирования для FigureArray
-TEST(FigureArrayTest, CopySemantics) {
+TEST(FigureArrayTest2, CopySemantics) {
     FigureArray<double> original;
-    auto square = std::make_shared<Square<double>>();
+    auto square = new Square<double>();
     original.addFigure(square);
     
     FigureArray<double> copy = original;  // Копирование
@@ -241,10 +241,10 @@ TEST(FigureArrayTest, CopySemantics) {
 }
 
 // Тест операторов доступа к элементам массива фигур
-TEST(FigureArrayTest, AccessOperators) {
+TEST(FigureArrayTest3, AccessOperators) {
     FigureArray<double> figureArray;
     
-    auto square = std::make_shared<Square<double>>();
+    auto square = new Square<double>();
     figureArray.addFigure(square);
     
     EXPECT_NEAR(figureArray[0]->area(), 4.0, 1e-9);  // Доступ через оператор[]
@@ -256,14 +256,14 @@ TEST(FigureArrayTest, AccessOperators) {
 
 // Тест преобразования фигуры в double (площадь)
 TEST(FigureTest, DoubleConversion) {
-    auto square = std::make_shared<Square<double>>();
-    double area = static_cast<double>(*square);  // Использует operator double()
+    Square<double> square;
+    double area = static_cast<double>(square);  // Использует operator double()
     
     EXPECT_NEAR(area, 4.0, 1e-9);  // Площадь должна быть 4.0
 }
 
 // Тест ввода/вывода для фигур
-TEST(FigureTest, InputOutput) {
+TEST(FigureTest1, InputOutput) {
     Square<double> square;
     std::stringstream ss;
     
@@ -281,22 +281,25 @@ TEST(FigureTest, InputOutput) {
 }
 
 // Тест клонирования фигур
-TEST(FigureTest, Clone) {
-    auto original = std::make_shared<Square<double>>();
-    auto cloned = original->clone();  // Создаем клон
+TEST(FigureTest2, Clone) {
+    Square<double> original;
+    auto cloned = original.clone();  // Создаем клон
     
-    EXPECT_TRUE(*original == *cloned);  // Содержимое должно быть одинаковым
-    EXPECT_NE(original.get(), cloned.get());  // Но это разные объекты в памяти
+    EXPECT_TRUE(original == *cloned);  // Содержимое должно быть одинаковым
+    EXPECT_NE(&original, cloned);  // Но это разные объекты в памяти
+    
+    delete cloned;  // Не забываем освободить память
 }
 
+
 // Тест работы с разными типами фигур в одном массиве
-TEST(FigureArrayTest, MixedFigures) {
+TEST(FigureArrayTest4, MixedFigures) {
     FigureArray<double> figureArray;
     
     // Добавляем разные типы фигур
-    auto square = std::make_shared<Square<double>>();
-    auto rectangle = std::make_shared<Rectangle<double>>();
-    auto trapezoid = std::make_shared<Trapezoid<double>>();
+    auto square = new Square<double>();
+    auto rectangle = new Rectangle<double>();
+    auto trapezoid = new Trapezoid<double>();
     
     figureArray.addFigure(square);
     figureArray.addFigure(rectangle);
@@ -311,7 +314,7 @@ TEST(FigureArrayTest, MixedFigures) {
 }
 
 // Тест обработки исключений при выходе за границы массива
-TEST(ArrayTest, OutOfRange) {
+TEST(ArrayTest3, OutOfRange) {
     Array<int> arr(3, 1);
     
     EXPECT_THROW(arr[5], std::out_of_range);   // Доступ за границами
@@ -319,7 +322,7 @@ TEST(ArrayTest, OutOfRange) {
 }
 
 // Тест операций с пустым массивом фигур
-TEST(FigureArrayTest, EmptyArrayOperations) {
+TEST(FigureArrayTest5, EmptyArrayOperations) {
     FigureArray<double> emptyArray;
     
     EXPECT_EQ(emptyArray.size(), 0);
@@ -327,9 +330,4 @@ TEST(FigureArrayTest, EmptyArrayOperations) {
     
     // Удаление из пустого массива не должно вызывать ошибок
     EXPECT_NO_THROW(emptyArray.removeFigure(0));
-}
-
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }
